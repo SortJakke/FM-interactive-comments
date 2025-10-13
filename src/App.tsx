@@ -1,8 +1,11 @@
-import { faSun } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import CommentSection from "./pages/index"
 
 function App() {
-  return <h1 className="text-blue-900 text-3xl font-bold underline">Hello world! <FontAwesomeIcon icon={faSun}/></h1>
+  return (
+    <main className="min-h-screen bg-gray-100">
+      <CommentSection />
+    </main>
+  )
 }
 
 export default App
