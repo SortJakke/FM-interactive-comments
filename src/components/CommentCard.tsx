@@ -11,9 +11,16 @@ interface Props {
   currentUser: User
   onReply: (commentId: number, content: string, replyingTo: string) => void
   onEdit: (commentId: number, newContent: string) => void
+  onEditReply: (commentId: number, replyId: number, newContent: string) => void
 }
 
-const CommentCard = ({ comment, currentUser, onReply, onEdit }: Props) => {
+const CommentCard = ({
+  comment,
+  currentUser,
+  onReply,
+  onEdit,
+  onEditReply,
+}: Props) => {
   const [isReplying, setIsReplying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -73,6 +80,9 @@ const CommentCard = ({ comment, currentUser, onReply, onEdit }: Props) => {
               currentUser={currentUser}
               onReply={(replyingTo, content) =>
                 onReply(comment.id, content, replyingTo)
+              }
+              onEdit={(replyId, newContent) =>
+                onEditReply(comment.id, replyId, newContent)
               }
             />
           ))}
