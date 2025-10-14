@@ -22,14 +22,18 @@ const CommentSection = () => {
       comments: [...prev.comments, newComment],
     }))
   }
-  const handleReply = (commentId: number, content:string) => {
+  const handleReply = (
+    commentId: number,
+    content: string,
+    replyingTo: string
+  ) => {
     const newReply: Reply = {
       id: Date.now(),
       content,
       createdAt: "right now",
       score: 0,
-      replyingTo: commentsData.comments.find(c => c.id === commentId)?.user.username || '',
-      user: commentsData.currentUser
+      replyingTo,
+      user: commentsData.currentUser,
     }
 
     setCommentsData((prev) => ({
@@ -45,9 +49,9 @@ const CommentSection = () => {
   return (
     <section className="max-w-2xl mx-auto px-4 py-8 grid gap-4">
       {commentsData.comments.map((comment) => (
-        <CommentCard 
+        <CommentCard
           key={comment.id}
-          comment={comment} 
+          comment={comment}
           currentUser={commentsData.currentUser}
           onReply={handleReply}
         />

@@ -9,7 +9,7 @@ import { faReply } from "@fortawesome/free-solid-svg-icons"
 interface Props {
   comment: Comment
   currentUser: User
-  onReply: (commentId: number, content: string) => void
+  onReply: (commentId: number, content: string, replyingTo: string) => void
 }
 
 const CommentCard = ({ comment, currentUser, onReply }: Props) => {
@@ -41,7 +41,14 @@ const CommentCard = ({ comment, currentUser, onReply }: Props) => {
       {comment.replies.length > 0 && (
         <div className="space-y-4">
           {comment.replies.map((reply) => (
-            <ReplyCard key={reply.id} reply={reply} />
+            <ReplyCard
+              key={reply.id}
+              reply={reply}
+              currentUser={currentUser}
+              onReply={(replyingTo, content) =>
+                onReply(comment.id, content, replyingTo)
+              }
+            />
           ))}
         </div>
       )}
@@ -52,7 +59,7 @@ const CommentCard = ({ comment, currentUser, onReply }: Props) => {
           replyingTo={comment.user.username}
           actionLabel="Reply"
           onSubmit={(content) => {
-            onReply(comment.id, content)
+            onReply(comment.id, content, comment.user.username)
             setIsReplying(false)
           }}
         />
