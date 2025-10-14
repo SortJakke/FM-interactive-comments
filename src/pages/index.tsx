@@ -45,6 +45,14 @@ const CommentSection = () => {
       ),
     }))
   }
+  const handleEdit = (commentId: number, newContent: string) => {
+    setCommentsData((prev) => ({
+      ...prev,
+      comments: prev.comments.map((comment) =>
+        comment.id === commentId ? { ...comment, content: newContent } : comment
+      ),
+    }))
+  }
 
   return (
     <section className="max-w-2xl mx-auto px-4 py-8 grid gap-4">
@@ -54,6 +62,7 @@ const CommentSection = () => {
           comment={comment}
           currentUser={commentsData.currentUser}
           onReply={handleReply}
+          onEdit={handleEdit}
         />
       ))}
       <CommentForm

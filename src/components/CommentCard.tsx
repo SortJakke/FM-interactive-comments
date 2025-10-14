@@ -4,16 +4,20 @@ import ReplyCard from "./ReplyCard"
 import CommentForm from "./CommentForm"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faReply } from "@fortawesome/free-solid-svg-icons"
+import { faReply, faPen } from "@fortawesome/free-solid-svg-icons"
 
 interface Props {
   comment: Comment
   currentUser: User
   onReply: (commentId: number, content: string, replyingTo: string) => void
+  onEdit: (commentId: number, newContent: string) => void
 }
 
-const CommentCard = ({ comment, currentUser, onReply }: Props) => {
+const CommentCard = ({ comment, currentUser, onReply, onEdit }: Props) => {
   const [isReplying, setIsReplying] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+
+  const isOwner = comment.user.username === currentUser.username
 
   return (
     <div className="space-y-4">
@@ -26,15 +30,37 @@ const CommentCard = ({ comment, currentUser, onReply }: Props) => {
           />
           <div className="font-semibold">{comment.user.username}</div>
           <div className="text-gray-500">{comment.createdAt}</div>
-          <button
-            onClick={() => setIsReplying(!isReplying)}
-            className="text-blue-500 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faReply} />
-            Reply
-          </button>
+          {isOwner ? (
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="text-blue-500 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faPen} />
+              Edit
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsReplying(!isReplying)}
+              className="text-blue-500 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faReply} />
+              Reply
+            </button>
+          )}
         </div>
-        <p className="mt-4 text-gray-700">{comment.content}</p>
+        {isEditing ? (
+          <CommentForm
+            currentUser={currentUser}
+            actionLabel="Edit"
+            initialContent={comment.content}
+            onSubmit={(content) => {
+              onEdit(comment.id, content)
+              setIsEditing(false)
+            }}
+          />
+        ) : (
+          <p className="mt-4 text-gray-700">{comment.content}</p>
+        )}
         <div className="mt-4 text-blue-700">{comment.score}</div>
       </div>
 
