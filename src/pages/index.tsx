@@ -1,6 +1,6 @@
 import { useState } from "react"
 import data from "../data/data.json"
-import type { CommentsData, Comment } from "../types/types"
+import type { CommentsData, Comment, Reply } from "../types/types"
 import CommentCard from "../components/CommentCard"
 import CommentForm from "../components/CommentForm"
 
@@ -22,11 +22,35 @@ const CommentSection = () => {
       comments: [...prev.comments, newComment],
     }))
   }
+  const handleReply = (commentId: number, content:string) => {
+    const newReply: Reply = {
+      id: Date.now(),
+      content,
+      createdAt: "right now",
+      score: 0,
+      replyingTo: commentsData.comments.find(c => c.id === commentId)?.user.username || '',
+      user: commentsData.currentUser
+    }
+
+    setCommentsData((prev) => ({
+      ...prev,
+      comments: prev.comments.map((comment) =>
+        comment.id === commentId
+          ? { ...comment, replies: [...comment.replies, newReply] }
+          : comment
+      ),
+    }))
+  }
 
   return (
     <section className="max-w-2xl mx-auto px-4 py-8 grid gap-4">
       {commentsData.comments.map((comment) => (
-        <CommentCard key={comment.id} comment={comment} />
+        <CommentCard 
+          key={comment.id}
+          comment={comment} 
+          currentUser={commentsData.currentUser}
+          onReply={handleReply}
+        />
       ))}
       <CommentForm
         currentUser={commentsData.currentUser}
