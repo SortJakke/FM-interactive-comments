@@ -1,11 +1,27 @@
 import { useState } from "react"
 import data from "../data/data.json"
-import type { CommentsData } from "../types/types"
+import type { CommentsData, Comment } from "../types/types"
 import CommentCard from "../components/CommentCard"
 import CommentForm from "../components/CommentForm"
 
 const CommentSection = () => {
-  const [commentsData] = useState<CommentsData>(data)
+  const [commentsData, setCommentsData] = useState<CommentsData>(data)
+
+  const handleAddComment = (content: string) => {
+    const newComment: Comment = {
+      id: Date.now(),
+      content,
+      createdAt: "right now",
+      score: 0,
+      user: commentsData.currentUser,
+      replies: [],
+    }
+
+    setCommentsData((prev) => ({
+      ...prev,
+      comments: [...prev.comments, newComment],
+    }))
+  }
 
   return (
     <section className="max-w-2xl mx-auto px-4 py-8 grid gap-4">
@@ -15,9 +31,7 @@ const CommentSection = () => {
       <CommentForm
         currentUser={commentsData.currentUser}
         actionLabel="Send"
-        onSubmit={(content) => {
-          console.log("Comment:", content)
-        }}
+        onSubmit={handleAddComment}
       />
     </section>
   )
