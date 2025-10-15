@@ -73,7 +73,10 @@ const ReplyCard = ({
           }}
         />
       ) : (
-        <p className="mt-4 text-gray-700">{reply.content}</p>
+        <p className="mt-4 text-gray-700">
+          <span className="text-blue-700 font-medium">@{reply.replyingTo}</span>{" "}
+          {reply.content}
+        </p>
       )}
       <div className="mt-2 text-blue-700">{reply.score}</div>
 
@@ -81,6 +84,7 @@ const ReplyCard = ({
         <CommentForm
           currentUser={currentUser}
           replyingTo={reply.user.username}
+          actionLabel="Reply"
           onSubmit={(content) => {
             onReply(reply.user.username, content)
             setIsReplying(false)

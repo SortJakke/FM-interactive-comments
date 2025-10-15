@@ -84,6 +84,18 @@ const CommentCard = ({
         <div className="mt-4 text-blue-700">{comment.score}</div>
       </div>
 
+      {isReplying && (
+        <CommentForm
+          currentUser={currentUser}
+          replyingTo={comment.user.username}
+          actionLabel="Reply"
+          onSubmit={(content) => {
+            onReply(comment.id, content, comment.user.username)
+            setIsReplying(false)
+          }}
+        />
+      )}
+
       {comment.replies.length > 0 && (
         <div className="space-y-4">
           {comment.replies.map((reply) => (
@@ -101,18 +113,6 @@ const CommentCard = ({
             />
           ))}
         </div>
-      )}
-
-      {isReplying && (
-        <CommentForm
-          currentUser={currentUser}
-          replyingTo={comment.user.username}
-          actionLabel="Reply"
-          onSubmit={(content) => {
-            onReply(comment.id, content, comment.user.username)
-            setIsReplying(false)
-          }}
-        />
       )}
     </div>
   )
