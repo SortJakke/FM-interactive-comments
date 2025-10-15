@@ -1,12 +1,25 @@
+import type { CommentsData } from "../types/types"
 import { useState } from "react"
+import { useComments } from "../hooks/useComments"
 import data from "../data/data.json"
-import type { CommentsData, Comment, Reply } from "../types/types"
+
 import CommentCard from "../components/CommentCard"
 import CommentForm from "../components/CommentForm"
 import ConfirmModal from "../components/ConfirmModal"
 
 const CommentSection = () => {
   const [commentsData, setCommentsData] = useState<CommentsData>(data)
+
+  const {
+    handleAddComment,
+    handleAddReply,
+    handleEditComment,
+    handleEditReply,
+    handleVoteComment,
+    handleVoteReply,
+    handleDeleteComment,
+    handleDeleteReply,
+  } = useComments(commentsData, setCommentsData)
 
   const [showModal, setShowModal] = useState(false)
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null)
@@ -15,84 +28,13 @@ const CommentSection = () => {
   const [replyToDeleteId, setReplyToDeleteId] = useState<number | null>(null)
   const [replyParentId, setReplyParentId] = useState<number | null>(null)
 
-  const handleAddComment = (content: string) => {
-    const newComment: Comment = {
-      id: Date.now(),
-      content,
-      createdAt: "right now",
-      score: 0,
-      user: commentsData.currentUser,
-      replies: [],
-    }
-
-    setCommentsData((prev) => ({
-      ...prev,
-      comments: [...prev.comments, newComment],
-    }))
-  }
-  const handleReply = (
-    commentId: number,
-    content: string,
-    replyingTo: string
-  ) => {
-    const newReply: Reply = {
-      id: Date.now(),
-      content,
-      createdAt: "right now",
-      score: 0,
-      replyingTo,
-      user: commentsData.currentUser,
-    }
-
-    setCommentsData((prev) => ({
-      ...prev,
-      comments: prev.comments.map((comment) =>
-        comment.id === commentId
-          ? { ...comment, replies: [...comment.replies, newReply] }
-          : comment
-      ),
-    }))
-  }
-  const handleEdit = (commentId: number, newContent: string) => {
-    setCommentsData((prev) => ({
-      ...prev,
-      comments: prev.comments.map((comment) =>
-        comment.id === commentId ? { ...comment, content: newContent } : comment
-      ),
-    }))
-  }
-  const handleEditReply = (
-    commentId: number,
-    replyId: number,
-    newContent: string
-  ) => {
-    setCommentsData((prev) => ({
-      ...prev,
-      comments: prev.comments.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              replies: comment.replies.map((reply) =>
-                reply.id === replyId ? { ...reply, content: newContent } : reply
-              ),
-            }
-          : comment
-      ),
-    }))
-  }
-
   const confirmDeleteComment = (commentId: number) => {
     setCommentToDelete(commentId)
     setShowModal(true)
   }
-  const handleDelete = () => {
+  const deleteComment = () => {
     if (commentToDelete !== null) {
-      setCommentsData((prev) => ({
-        ...prev,
-        comments: prev.comments.filter(
-          (comment) => comment.id !== commentToDelete
-        ),
-      }))
+      handleDeleteComment(commentToDelete)
       setCommentToDelete(null)
       setShowModal(false)
     }
@@ -102,55 +44,13 @@ const CommentSection = () => {
     setReplyToDeleteId(replyId)
     setShowReplyModal(true)
   }
-  const handleDeleteReply = () => {
+  const deleteReply = () => {
     if (replyParentId !== null && replyToDeleteId !== null) {
-      setCommentsData((prev) => ({
-        ...prev,
-        comments: prev.comments.map((comment) =>
-          comment.id === replyParentId
-            ? {
-                ...comment,
-                replies: comment.replies.filter(
-                  (reply) => reply.id !== replyToDeleteId
-                ),
-              }
-            : comment
-        ),
-      }))
+      handleDeleteReply(replyParentId, replyToDeleteId)
       setReplyParentId(null)
       setReplyToDeleteId(null)
       setShowReplyModal(false)
     }
-  }
-
-  const handleVoteComment = (commentId: number, direction: "up" | "down") => {
-    setCommentsData((prev) => ({
-      ...prev,
-      comments: prev.comments.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              score: direction === "up" ? comment.score + 1 : comment.score - 1,
-            }
-          : comment
-      ),
-    }))
-  }
-  const handleVoteReply = (replyId: number, direction: "up" | "down") => {
-    setCommentsData((prev) => ({
-      ...prev,
-      comments: prev.comments.map((comment) => ({
-        ...comment,
-        replies: comment.replies.map((reply) =>
-          reply.id === replyId
-            ? {
-                ...reply,
-                score: direction === "up" ? reply.score + 1 : reply.score - 1,
-              }
-            : reply
-        ),
-      })),
-    }))
   }
 
   return (
@@ -163,8 +63,8 @@ const CommentSection = () => {
             key={comment.id}
             comment={comment}
             currentUser={commentsData.currentUser}
-            onReply={handleReply}
-            onEdit={handleEdit}
+            onReply={handleAddReply}
+            onEdit={handleEditComment}
             onEditReply={handleEditReply}
             onDelete={confirmDeleteComment}
             onDeleteReply={confirmDeleteReply}
@@ -182,7 +82,7 @@ const CommentSection = () => {
         <ConfirmModal
           title="Delete comment"
           message="Are you sure you want to delete this comment? This will remove the comment and can't be undone."
-          onConfirm={handleDelete}
+          onConfirm={deleteComment}
           onCancel={() => setShowModal(false)}
         />
       )}
@@ -191,7 +91,7 @@ const CommentSection = () => {
         <ConfirmModal
           title="Delete reply"
           message="Are you sure you want to delete this reply? This will remove the reply and cannot be undone."
-          onConfirm={handleDeleteReply}
+          onConfirm={deleteReply}
           onCancel={() => setShowReplyModal(false)}
         />
       )}
