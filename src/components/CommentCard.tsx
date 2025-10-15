@@ -4,7 +4,7 @@ import ReplyCard from "./ReplyCard"
 import CommentForm from "./CommentForm"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faReply, faPen } from "@fortawesome/free-solid-svg-icons"
+import { faReply, faPen, faTrash } from "@fortawesome/free-solid-svg-icons"
 
 interface Props {
   comment: Comment
@@ -12,6 +12,8 @@ interface Props {
   onReply: (commentId: number, content: string, replyingTo: string) => void
   onEdit: (commentId: number, newContent: string) => void
   onEditReply: (commentId: number, replyId: number, newContent: string) => void
+  onDelete: (commentId: number) => void
+  onDeleteReply: (commentId: number, replyId: number) => void
 }
 
 const CommentCard = ({
@@ -20,6 +22,8 @@ const CommentCard = ({
   onReply,
   onEdit,
   onEditReply,
+  onDelete,
+  onDeleteReply,
 }: Props) => {
   const [isReplying, setIsReplying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -38,13 +42,22 @@ const CommentCard = ({
           <div className="font-semibold">{comment.user.username}</div>
           <div className="text-gray-500">{comment.createdAt}</div>
           {isOwner ? (
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="text-blue-500 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPen} />
-              Edit
-            </button>
+            <div className="flex gap-4 ml-auto">
+              <button
+                onClick={() => onDelete(comment.id)}
+                className="text-red-500 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faTrash} />
+                Delete
+              </button>
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="text-blue-500 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPen} />
+                Edit
+              </button>
+            </div>
           ) : (
             <button
               onClick={() => setIsReplying(!isReplying)}
@@ -84,6 +97,7 @@ const CommentCard = ({
               onEdit={(replyId, newContent) =>
                 onEditReply(comment.id, replyId, newContent)
               }
+              onDelete={(replyId) => onDeleteReply(comment.id, replyId)}
             />
           ))}
         </div>

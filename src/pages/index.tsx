@@ -3,9 +3,17 @@ import data from "../data/data.json"
 import type { CommentsData, Comment, Reply } from "../types/types"
 import CommentCard from "../components/CommentCard"
 import CommentForm from "../components/CommentForm"
+import ConfirmModal from "../components/ConfirmModal"
 
 const CommentSection = () => {
   const [commentsData, setCommentsData] = useState<CommentsData>(data)
+
+  const [showModal, setShowModal] = useState(false)
+  const [commentToDelete, setCommentToDelete] = useState<number | null>(null)
+
+  const [showReplyModal, setShowReplyModal] = useState(false)
+  const [replyToDeleteId, setReplyToDeleteId] = useState<number | null>(null)
+  const [replyParentId, setReplyParentId] = useState<number | null>(null)
 
   const handleAddComment = (content: string) => {
     const newComment: Comment = {
@@ -73,6 +81,49 @@ const CommentSection = () => {
     }))
   }
 
+  const confirmDeleteComment = (commentId: number) => {
+    setCommentToDelete(commentId)
+    setShowModal(true)
+  }
+  const handleDelete = () => {
+    if (commentToDelete !== null) {
+      setCommentsData((prev) => ({
+        ...prev,
+        comments: prev.comments.filter(
+          (comment) => comment.id !== commentToDelete
+        ),
+      }))
+      setCommentToDelete(null)
+      setShowModal(false)
+    }
+  }
+
+  const confirmDeleteReply = (commentId: number, replyId: number) => {
+    setReplyParentId(commentId)
+    setReplyToDeleteId(replyId)
+    setShowReplyModal(true)
+  }
+  const handleDeleteReply = () => {
+    if (replyParentId !== null && replyToDeleteId !== null) {
+      setCommentsData((prev) => ({
+        ...prev,
+        comments: prev.comments.map((comment) =>
+          comment.id === replyParentId
+            ? {
+                ...comment,
+                replies: comment.replies.filter(
+                  (reply) => reply.id !== replyToDeleteId
+                ),
+              }
+            : comment
+        ),
+      }))
+      setReplyParentId(null)
+      setReplyToDeleteId(null)
+      setShowReplyModal(false)
+    }
+  }
+
   return (
     <section className="max-w-2xl mx-auto px-4 py-8 grid gap-4">
       {commentsData.comments.map((comment) => (
@@ -83,6 +134,8 @@ const CommentSection = () => {
           onReply={handleReply}
           onEdit={handleEdit}
           onEditReply={handleEditReply}
+          onDelete={confirmDeleteComment}
+          onDeleteReply={confirmDeleteReply}
         />
       ))}
       <CommentForm
@@ -90,6 +143,24 @@ const CommentSection = () => {
         actionLabel="Send"
         onSubmit={handleAddComment}
       />
+
+      {showModal && (
+        <ConfirmModal
+          title="Delete comment"
+          message="Are you sure you want to delete this comment? This will remove the comment and can't be undone."
+          onConfirm={handleDelete}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
+
+      {showReplyModal && (
+        <ConfirmModal
+          title="Delete reply"
+          message="Are you sure you want to delete this reply? This will remove the reply and cannot be undone."
+          onConfirm={handleDeleteReply}
+          onCancel={() => setShowReplyModal(false)}
+        />
+      )}
     </section>
   )
 }

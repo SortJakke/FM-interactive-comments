@@ -3,16 +3,23 @@ import { useState } from "react"
 import CommentForm from "./CommentForm"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faReply, faPen } from "@fortawesome/free-solid-svg-icons"
+import { faReply, faPen, faTrash } from "@fortawesome/free-solid-svg-icons"
 
 interface Props {
   reply: Reply
   currentUser: User
   onReply: (replyingTo: string, content: string) => void
   onEdit: (replyId: number, newContent: string) => void
+  onDelete: (replyId: number) => void
 }
 
-const ReplyCard = ({ reply, currentUser, onReply, onEdit }: Props) => {
+const ReplyCard = ({
+  reply,
+  currentUser,
+  onReply,
+  onEdit,
+  onDelete,
+}: Props) => {
   const [isReplying, setIsReplying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -29,13 +36,22 @@ const ReplyCard = ({ reply, currentUser, onReply, onEdit }: Props) => {
         <div className="font-semibold">{reply.user.username}</div>
         <div className="text-gray-500">{reply.createdAt}</div>
         {isOwner ? (
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="text-blue-500 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faPen} />
-            Edit
-          </button>
+          <div className="flex gap-4 ml-auto">
+            <button
+              onClick={() => onDelete(reply.id)}
+              className="text-red-500 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faTrash} />
+              Delete
+            </button>
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="text-blue-500 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faPen} />
+              Edit
+            </button>
+          </div>
         ) : (
           <button
             onClick={() => setIsReplying(!isReplying)}
