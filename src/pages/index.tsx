@@ -97,7 +97,6 @@ const CommentSection = () => {
       setShowModal(false)
     }
   }
-
   const confirmDeleteReply = (commentId: number, replyId: number) => {
     setReplyParentId(commentId)
     setReplyToDeleteId(replyId)
@@ -124,20 +123,55 @@ const CommentSection = () => {
     }
   }
 
+  const handleVoteComment = (commentId: number, direction: "up" | "down") => {
+    setCommentsData((prev) => ({
+      ...prev,
+      comments: prev.comments.map((comment) =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              score: direction === "up" ? comment.score + 1 : comment.score - 1,
+            }
+          : comment
+      ),
+    }))
+  }
+  const handleVoteReply = (replyId: number, direction: "up" | "down") => {
+    setCommentsData((prev) => ({
+      ...prev,
+      comments: prev.comments.map((comment) => ({
+        ...comment,
+        replies: comment.replies.map((reply) =>
+          reply.id === replyId
+            ? {
+                ...reply,
+                score: direction === "up" ? reply.score + 1 : reply.score - 1,
+              }
+            : reply
+        ),
+      })),
+    }))
+  }
+
   return (
     <section className="max-w-2xl mx-auto px-4 py-8 grid gap-4">
-      {commentsData.comments.map((comment) => (
-        <CommentCard
-          key={comment.id}
-          comment={comment}
-          currentUser={commentsData.currentUser}
-          onReply={handleReply}
-          onEdit={handleEdit}
-          onEditReply={handleEditReply}
-          onDelete={confirmDeleteComment}
-          onDeleteReply={confirmDeleteReply}
-        />
-      ))}
+      {commentsData.comments
+        .slice()
+        .sort((a, b) => b.score - a.score)
+        .map((comment) => (
+          <CommentCard
+            key={comment.id}
+            comment={comment}
+            currentUser={commentsData.currentUser}
+            onReply={handleReply}
+            onEdit={handleEdit}
+            onEditReply={handleEditReply}
+            onDelete={confirmDeleteComment}
+            onDeleteReply={confirmDeleteReply}
+            onVote={handleVoteComment}
+            onVoteReply={handleVoteReply}
+          />
+        ))}
       <CommentForm
         currentUser={commentsData.currentUser}
         actionLabel="Send"

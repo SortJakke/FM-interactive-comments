@@ -14,6 +14,8 @@ interface Props {
   onEditReply: (commentId: number, replyId: number, newContent: string) => void
   onDelete: (commentId: number) => void
   onDeleteReply: (commentId: number, replyId: number) => void
+  onVote: (commentId: number, direction: "up" | "down") => void
+  onVoteReply: (replyId: number, direction: "up" | "down") => void
 }
 
 const CommentCard = ({
@@ -24,6 +26,8 @@ const CommentCard = ({
   onEditReply,
   onDelete,
   onDeleteReply,
+  onVote,
+  onVoteReply,
 }: Props) => {
   const [isReplying, setIsReplying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -81,7 +85,21 @@ const CommentCard = ({
         ) : (
           <p className="mt-4 text-gray-700">{comment.content}</p>
         )}
-        <div className="mt-4 text-blue-700">{comment.score}</div>
+        <div className="w-fit mt-4 flex items-center gap-2 rounded-md font-medium text-gray-500 bg-gray-100">
+          <button
+            onClick={() => onVote(comment.id, "up")}
+            className="px-2 py-1 hover:text-blue-500 cursor-pointer"
+          >
+            +
+          </button>
+          <span className="text-blue-500">{comment.score}</span>
+          <button
+            onClick={() => onVote(comment.id, "down")}
+            className="px-2 py-1 hover:text-blue-500 cursor-pointer"
+          >
+            –
+          </button>
+        </div>
       </div>
 
       {isReplying && (
@@ -98,20 +116,24 @@ const CommentCard = ({
 
       {comment.replies.length > 0 && (
         <div className="space-y-4">
-          {comment.replies.map((reply) => (
-            <ReplyCard
-              key={reply.id}
-              reply={reply}
-              currentUser={currentUser}
-              onReply={(replyingTo, content) =>
-                onReply(comment.id, content, replyingTo)
-              }
-              onEdit={(replyId, newContent) =>
-                onEditReply(comment.id, replyId, newContent)
-              }
-              onDelete={(replyId) => onDeleteReply(comment.id, replyId)}
-            />
-          ))}
+          {comment.replies
+            .slice()
+            .sort((a, b) => b.score - a.score)
+            .map((reply) => (
+              <ReplyCard
+                key={reply.id}
+                reply={reply}
+                currentUser={currentUser}
+                onReply={(replyingTo, content) =>
+                  onReply(comment.id, content, replyingTo)
+                }
+                onEdit={(replyId, newContent) =>
+                  onEditReply(comment.id, replyId, newContent)
+                }
+                onDelete={(replyId) => onDeleteReply(comment.id, replyId)}
+                onVote={onVoteReply}
+              />
+            ))}
         </div>
       )}
     </div>

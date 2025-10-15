@@ -11,6 +11,7 @@ interface Props {
   onReply: (replyingTo: string, content: string) => void
   onEdit: (replyId: number, newContent: string) => void
   onDelete: (replyId: number) => void
+  onVote: (replyId: number, direction: "up" | "down") => void
 }
 
 const ReplyCard = ({
@@ -19,6 +20,7 @@ const ReplyCard = ({
   onReply,
   onEdit,
   onDelete,
+  onVote
 }: Props) => {
   const [isReplying, setIsReplying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -78,7 +80,21 @@ const ReplyCard = ({
           {reply.content}
         </p>
       )}
-      <div className="mt-2 text-blue-700">{reply.score}</div>
+      <div className="w-fit mt-4 flex items-center gap-2 rounded-md font-medium text-gray-500 bg-gray-100">
+        <button
+          onClick={() => onVote(reply.id, "up")}
+          className="px-2 py-1 hover:text-blue-500 cursor-pointer"
+        >
+          +
+        </button>
+        <span className="text-blue-500">{reply.score}</span>
+        <button
+          onClick={() => onVote(reply.id, "down")}
+          className="px-2 py-1 hover:text-blue-500 cursor-pointer"
+        >
+          –
+        </button>
+      </div>
 
       {isReplying && (
         <CommentForm
