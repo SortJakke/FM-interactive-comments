@@ -31,6 +31,7 @@ const CommentCard = ({
 }: Props) => {
   const [isReplying, setIsReplying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [showReplies, setShowReplies] = useState(false)
 
   const isOwner = comment.user.username === currentUser.username
 
@@ -85,20 +86,59 @@ const CommentCard = ({
         ) : (
           <p className="mt-4 text-gray-700">{comment.content}</p>
         )}
-        <div className="w-fit mt-4 flex items-center gap-2 rounded-md font-medium text-gray-500 bg-gray-100">
-          <button
-            onClick={() => onVote(comment.id, "up")}
-            className="px-2 py-1 hover:text-blue-500 cursor-pointer"
-          >
-            +
-          </button>
-          <span className="text-blue-500">{comment.score}</span>
-          <button
-            onClick={() => onVote(comment.id, "down")}
-            className="px-2 py-1 hover:text-blue-500 cursor-pointer"
-          >
-            –
-          </button>
+        <div className="flex items-center justify-between mt-4">
+          <div className="w-fit flex items-center gap-2 rounded-md font-medium text-gray-500 bg-gray-100">
+            <button
+              onClick={() => onVote(comment.id, "up")}
+              className="px-2 py-1 hover:text-blue-500 cursor-pointer"
+            >
+              +
+            </button>
+            <span className="text-blue-500">{comment.score}</span>
+            <button
+              onClick={() => onVote(comment.id, "down")}
+              className="px-2 py-1 hover:text-blue-500 cursor-pointer"
+            >
+              –
+            </button>
+          </div>
+          {comment.replies.length > 0 && (
+            <button
+              onClick={() => setShowReplies(!showReplies)}
+              className="flex items-center gap-2 text-sm font-medium text-blue-500 rounded-md px-2 py-1 hover:bg-gray-100 cursor-pointer"
+            >
+              {showReplies ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="5 16 12 8 19 16" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="5 8 12 16 19 8" />
+                </svg>
+              )}
+              {comment.replies.length} replies
+            </button>
+          )}
         </div>
       </div>
 
@@ -114,7 +154,7 @@ const CommentCard = ({
         />
       )}
 
-      {comment.replies.length > 0 && (
+      {showReplies && comment.replies.length > 0 && (
         <div className="space-y-4">
           {comment.replies
             .slice()
