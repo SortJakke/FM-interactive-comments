@@ -7,6 +7,7 @@ interface Props {
   replyingTo?: string
   initialContent?: string
   actionLabel?: string
+  autoFocus?: boolean
 }
 
 const CommentForm = ({
@@ -15,16 +16,28 @@ const CommentForm = ({
   replyingTo,
   initialContent,
   actionLabel,
+  autoFocus,
 }: Props) => {
   const [content, setContent] = useState(initialContent ? initialContent : "")
 
   const isEdit = actionLabel === "Edit"
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const submitContent = () => {
     if (!content.trim()) return
     onSubmit(content)
     setContent("")
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    submitContent()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      submitContent()
+    }
   }
 
   return (
@@ -34,6 +47,10 @@ const CommentForm = ({
         isEdit ? "mt-4" : "bg-white p-4 rounded shadow"
       }`}
     >
+      <label htmlFor="comment-content" className="sr-only">
+        {replyingTo ? `Responding to ${replyingTo}` : "Add a comment"}
+      </label>
+
       {isEdit ? (
         ""
       ) : (
@@ -47,7 +64,15 @@ const CommentForm = ({
       )}
 
       <textarea
-        className="w-full p-4 border border-gray-100 rounded resize-none focus:outline-none focus:ring-2 focus:ring-purple-600 sm:flex-1"
+        id="comment-content"
+        aria-describedby="comment-help"
+        aria-required="true"
+        aria-label={
+          replyingTo ? `Responding to ${replyingTo}` : "Add a comment"
+        }
+        onKeyDown={handleKeyDown}
+        autoFocus={autoFocus}
+        className="w-full p-4 border text-gray-800 border-gray-100 rounded resize-none sm:flex-1"
         rows={3}
         placeholder={
           replyingTo ? `Responding to ${replyingTo}` : "Add a comment..."
@@ -55,6 +80,10 @@ const CommentForm = ({
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
+
+      <div id="comment-help" className="sr-only" aria-live="polite">
+        Enter your comment. Press Enter to submit.
+      </div>
 
       {isEdit ? (
         <button

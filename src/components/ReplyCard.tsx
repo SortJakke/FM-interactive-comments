@@ -33,13 +33,19 @@ const ReplyCard = ({
         <div className="w-[30px] hidden sm:block">
           <div className="h-fit flex flex-col items-center rounded-md font-medium text-gray-500 bg-gray-100">
             <button
+              type="button"
+              aria-label={`Upvote reply by ${reply.user.username}`}
               onClick={() => onVote(reply.id, "up")}
               className="px-2 py-1 hover:text-purple-600 cursor-pointer"
             >
               +
             </button>
-            <span className="text-purple-600">{reply.score}</span>
+            <span className="text-purple-600" aria-live="polite">
+              {reply.score}
+            </span>
             <button
+              type="button"
+              aria-label={`Downvote reply by ${reply.user.username}`}
               onClick={() => onVote(reply.id, "down")}
               className="px-2 py-1 hover:text-purple-600 cursor-pointer"
             >
@@ -60,26 +66,29 @@ const ReplyCard = ({
               {isOwner ? (
                 <div className="flex gap-4">
                   <button
+                    type="button"
                     onClick={() => onDelete(reply.id)}
                     className="text-pink-400 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
                   >
-                    <FontAwesomeIcon icon={faTrash} />
+                    <FontAwesomeIcon icon={faTrash} aria-hidden={true} />
                     Delete
                   </button>
                   <button
+                    type="button"
                     onClick={() => setIsEditing(!isEditing)}
                     className="text-purple-600 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
                   >
-                    <FontAwesomeIcon icon={faPen} />
+                    <FontAwesomeIcon icon={faPen} aria-hidden={true} />
                     Edit
                   </button>
                 </div>
               ) : (
                 <button
+                  type="button"
                   onClick={() => setIsReplying(!isReplying)}
                   className="text-purple-600 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
                 >
-                  <FontAwesomeIcon icon={faReply} />
+                  <FontAwesomeIcon icon={faReply} aria-hidden={true} />
                   Reply
                 </button>
               )}
@@ -90,6 +99,7 @@ const ReplyCard = ({
               currentUser={currentUser}
               actionLabel="Edit"
               initialContent={reply.content}
+              autoFocus
               onSubmit={(content) => {
                 onEdit(reply.id, content)
                 setIsEditing(false)
@@ -106,13 +116,19 @@ const ReplyCard = ({
           <div className="flex items-center justify-between mt-4 sm:hidden">
             <div className="w-fit flex items-center gap-2 rounded-md font-medium text-gray-500 bg-gray-100">
               <button
+                type="button"
+                aria-label={`Upvote reply by ${reply.user.username}`}
                 onClick={() => onVote(reply.id, "up")}
                 className="px-2 py-1 hover:text-purple-600 cursor-pointer"
               >
                 +
               </button>
-              <span className="text-purple-600">{reply.score}</span>
+              <span className="text-purple-600" aria-live="polite">
+                {reply.score}
+              </span>
               <button
+                type="button"
+                aria-label={`Downvote reply by ${reply.user.username}`}
                 onClick={() => onVote(reply.id, "down")}
                 className="px-2 py-1 hover:text-purple-600 cursor-pointer"
               >
@@ -123,26 +139,29 @@ const ReplyCard = ({
               {isOwner ? (
                 <div className="flex gap-4 ml-auto">
                   <button
+                    type="button"
                     onClick={() => onDelete(reply.id)}
                     className="text-pink-400 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
                   >
-                    <FontAwesomeIcon icon={faTrash} />
+                    <FontAwesomeIcon icon={faTrash} aria-hidden={true} />
                     Delete
                   </button>
                   <button
+                    type="button"
                     onClick={() => setIsEditing(!isEditing)}
                     className="text-purple-600 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
                   >
-                    <FontAwesomeIcon icon={faPen} />
+                    <FontAwesomeIcon icon={faPen} aria-hidden={true} />
                     Edit
                   </button>
                 </div>
               ) : (
                 <button
+                  type="button"
                   onClick={() => setIsReplying(!isReplying)}
                   className="text-purple-600 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
                 >
-                  <FontAwesomeIcon icon={faReply} />
+                  <FontAwesomeIcon icon={faReply} aria-hidden={true} />
                   Reply
                 </button>
               )}
@@ -155,6 +174,7 @@ const ReplyCard = ({
           currentUser={currentUser}
           replyingTo={reply.user.username}
           actionLabel="Reply"
+          autoFocus
           onSubmit={(content) => {
             onReply(reply.user.username, content)
             setIsReplying(false)

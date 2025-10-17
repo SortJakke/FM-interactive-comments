@@ -1,5 +1,5 @@
 import type { Comment, User } from "../types/types"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import ReplyCard from "./ReplyCard"
 import CommentForm from "./CommentForm"
 
@@ -31,9 +31,17 @@ const CommentCard = ({
 }: Props) => {
   const [isReplying, setIsReplying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [showReplies, setShowReplies] = useState(true)
+  const [showReplies, setShowReplies] = useState(false)
 
   const isOwner = comment.user.username === currentUser.username
+
+  const elRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    const el = elRef.current
+    if (!el) return
+    el.setAttribute("aria-controls", `replies-${comment.id}`)
+  }, [comment.id])
 
   return (
     <div className="space-y-4">
@@ -41,13 +49,19 @@ const CommentCard = ({
         <div className="w-[30px] hidden sm:block">
           <div className="h-fit flex flex-col items-center rounded-md font-medium text-gray-400 bg-gray-100">
             <button
+              type="button"
+              aria-label={`Upvote comment by ${comment.user.username}`}
               onClick={() => onVote(comment.id, "up")}
               className="px-2 py-1 hover:text-purple-600 cursor-pointer"
             >
               +
             </button>
-            <span className="text-purple-600">{comment.score}</span>
+            <span className="text-purple-600" aria-live="polite">
+              {comment.score}
+            </span>
             <button
+              type="button"
+              aria-label={`Downvote comment by ${comment.user.username}`}
               onClick={() => onVote(comment.id, "down")}
               className="px-2 py-1 hover:text-purple-600 cursor-pointer"
             >
@@ -77,26 +91,29 @@ const CommentCard = ({
               {isOwner ? (
                 <div className="flex gap-4">
                   <button
+                    type="button"
                     onClick={() => onDelete(comment.id)}
-                    className="text-red-500 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+                    className="text-pink-400 text-sm font-medium hover:opacity-60 cursor-pointer "
                   >
-                    <FontAwesomeIcon icon={faTrash} />
+                    <FontAwesomeIcon aria-hidden="true" icon={faTrash} />
                     Delete
                   </button>
                   <button
+                    type="button"
                     onClick={() => setIsEditing(!isEditing)}
-                    className="text-purple-600 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+                    className="text-purple-600 text-sm font-medium hover:opacity-60 cursor-pointer "
                   >
-                    <FontAwesomeIcon icon={faPen} />
+                    <FontAwesomeIcon aria-hidden="true" icon={faPen} />
                     Edit
                   </button>
                 </div>
               ) : (
                 <button
+                  type="button"
                   onClick={() => setIsReplying(!isReplying)}
-                  className="text-purple-600 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
+                  className="text-purple-600 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer "
                 >
-                  <FontAwesomeIcon icon={faReply} />
+                  <FontAwesomeIcon aria-hidden="true" icon={faReply} />
                   Reply
                 </button>
               )}
@@ -107,6 +124,7 @@ const CommentCard = ({
               currentUser={currentUser}
               actionLabel="Edit"
               initialContent={comment.content}
+              autoFocus
               onSubmit={(content) => {
                 onEdit(comment.id, content)
                 setIsEditing(false)
@@ -118,13 +136,19 @@ const CommentCard = ({
           <div className="flex items-center justify-between mt-4 sm:hidden">
             <div className="w-fit flex items-center gap-2 rounded-md font-medium text-gray-400 bg-gray-100">
               <button
+                type="button"
+                aria-label={`Upvote comment by ${comment.user.username}`}
                 onClick={() => onVote(comment.id, "up")}
                 className="px-2 py-1 hover:text-purple-600 cursor-pointer"
               >
                 +
               </button>
-              <span className="text-purple-600">{comment.score}</span>
+              <span className="text-purple-600" aria-live="polite">
+                {comment.score}
+              </span>
               <button
+                type="button"
+                aria-label={`Downvote comment by ${comment.user.username}`}
                 onClick={() => onVote(comment.id, "down")}
                 className="px-2 py-1 hover:text-purple-600 cursor-pointer"
               >
@@ -134,37 +158,43 @@ const CommentCard = ({
             {isOwner ? (
               <div className="flex gap-4 ml-auto">
                 <button
+                  type="button"
                   onClick={() => onDelete(comment.id)}
-                  className="text-pink-400 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+                  className="text-pink-400 text-sm font-medium hover:opacity-60 cursor-pointer "
                 >
-                  <FontAwesomeIcon icon={faTrash} />
+                  <FontAwesomeIcon aria-hidden="true" icon={faTrash} />
                   Delete
                 </button>
                 <button
+                  type="button"
                   onClick={() => setIsEditing(!isEditing)}
-                  className="text-purple-600 text-sm font-medium hover:opacity-60 cursor-pointer flex items-center gap-2"
+                  className="text-purple-600 text-sm font-medium hover:opacity-60 cursor-pointer "
                 >
-                  <FontAwesomeIcon icon={faPen} />
+                  <FontAwesomeIcon aria-hidden="true" icon={faPen} />
                   Edit
                 </button>
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => setIsReplying(!isReplying)}
-                className="text-purple-600 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer flex items-center gap-2"
+                className="text-purple-600 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer "
               >
-                <FontAwesomeIcon icon={faReply} />
+                <FontAwesomeIcon aria-hidden="true" icon={faReply} />
                 Reply
               </button>
             )}
           </div>
           {comment.replies.length > 0 && (
             <button
+              type="button"
+              ref={elRef}
               onClick={() => setShowReplies(!showReplies)}
               className="flex items-center gap-2 text-sm font-medium text-purple-600 rounded-md px-2 py-1 mt-4 hover:bg-gray-100 cursor-pointer"
             >
               {showReplies ? (
                 <svg
+                  aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -179,6 +209,7 @@ const CommentCard = ({
                 </svg>
               ) : (
                 <svg
+                  aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -202,6 +233,7 @@ const CommentCard = ({
         <CommentForm
           currentUser={currentUser}
           replyingTo={comment.user.username}
+          autoFocus
           actionLabel="Reply"
           onSubmit={(content) => {
             onReply(comment.id, content, comment.user.username)
@@ -211,7 +243,12 @@ const CommentCard = ({
       )}
 
       {showReplies && comment.replies.length > 0 && (
-        <div className="space-y-4 pl-8 shadow">
+        <div
+          id={`replies-${comment.id}`}
+          className="space-y-4 pl-8 shadow"
+          role="region"
+          aria-label={`Replies for comment by ${comment.user.username}`}
+        >
           {comment.replies
             .slice()
             .sort((a, b) => b.score - a.score)
