@@ -94,12 +94,14 @@ const CommentCard = ({
                     type="button"
                     onClick={() => onDelete(comment.id)}
                     className="text-pink-400 text-sm font-medium hover:opacity-60 cursor-pointer "
+                    data-testid="delete-button"
                   >
                     <FontAwesomeIcon aria-hidden="true" icon={faTrash} />
                     Delete
                   </button>
                   <button
                     type="button"
+                    data-testid="edit-button"
                     onClick={() => setIsEditing(!isEditing)}
                     className="text-purple-600 text-sm font-medium hover:opacity-60 cursor-pointer "
                   >
@@ -112,6 +114,7 @@ const CommentCard = ({
                   type="button"
                   onClick={() => setIsReplying(!isReplying)}
                   className="text-purple-600 text-sm font-medium ml-auto hover:opacity-60 cursor-pointer "
+                  data-testid="reply-button"
                 >
                   <FontAwesomeIcon aria-hidden="true" icon={faReply} />
                   Reply
@@ -137,17 +140,23 @@ const CommentCard = ({
             <div className="w-fit flex items-center gap-2 rounded-md font-medium text-gray-400 bg-gray-100">
               <button
                 type="button"
+                data-testid="upvote-button"
                 aria-label={`Upvote comment by ${comment.user.username}`}
                 onClick={() => onVote(comment.id, "up")}
                 className="px-2 py-1 hover:text-purple-600 cursor-pointer"
               >
                 +
               </button>
-              <span className="text-purple-600" aria-live="polite">
+              <span
+                className="text-purple-600"
+                aria-live="polite"
+                data-testid="comment-score"
+              >
                 {comment.score}
               </span>
               <button
                 type="button"
+                data-testid="downvote-button"
                 aria-label={`Downvote comment by ${comment.user.username}`}
                 onClick={() => onVote(comment.id, "down")}
                 className="px-2 py-1 hover:text-purple-600 cursor-pointer"
@@ -191,6 +200,7 @@ const CommentCard = ({
               ref={elRef}
               onClick={() => setShowReplies(!showReplies)}
               className="flex items-center gap-2 text-sm font-medium text-purple-600 rounded-md px-2 py-1 mt-4 hover:bg-gray-100 cursor-pointer"
+              data-testid="replies-toggle"
             >
               {showReplies ? (
                 <svg

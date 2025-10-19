@@ -36,6 +36,7 @@ const ConfirmModal = ({
             onClick={onCancel}
             autoFocus={true}
             className="px-4 py-2 rounded bg-gray-500 text-white hover:opacity-50 cursor-pointer uppercase"
+            data-testid="cancel-delete"
           >
             No, Cancel
           </button>
@@ -43,6 +44,7 @@ const ConfirmModal = ({
             type="button"
             onClick={onConfirm}
             className="px-4 py-2 rounded bg-pink-400 text-white hover:opacity-50 cursor-pointer uppercase"
+            data-testid="confirm-delete"
           >
             Yes, Delete
           </button>
